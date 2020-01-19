@@ -24,3 +24,10 @@ ipcRenderer.on('createSuccess', (event, message) => {
 ipcRenderer.on('createSuccess:error', (event, error) => {
     console.error(error)
 })
+
+document.getElementById('newWindow')
+    .addEventListener('click', (e) => {
+        e.preventDefault()
+
+        ipcRenderer.send('newWindow')
+    })

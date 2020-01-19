@@ -45,3 +45,24 @@ ipcMain.on('createdQuestion', async (e, question) => {
 
   mainWindow.webContents.send('createSuccess', 'Answer stored')
 })
+
+let newWindow
+
+ipcMain.on('newWindow', async () => {
+  console.log('opening new window')
+  newWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+    },
+    parent: mainWindow
+  })
+
+  newWindow.loadFile('src/add/index.html')
+
+  newWindow.on('closed', () => {
+    newWindow = null
+  })
+})

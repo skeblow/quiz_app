@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, ipcMain} = require('electron')
 const path = require('path')
 
 let mainWindow
@@ -8,11 +8,12 @@ function createWindow () {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
     }
   })
 
-  mainWindow.loadFile('index.html')
+  mainWindow.loadFile('src/index.html')
   mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', () => {
@@ -32,4 +33,15 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
+})
+
+ipcMain.on('createdQuestion', async (e, question) => {
+  console.log('question', question)
+
+  if (! question.text) {
+    mainWindow.webContents.send('createSuccess:error', 'error!')
+    return
+  }
+
+  mainWindow.webContents.send('createSuccess', 'Answer stored')
 })

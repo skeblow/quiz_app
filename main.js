@@ -1,5 +1,14 @@
 const {app, BrowserWindow, ipcMain} = require('electron')
 const path = require('path')
+const express = require('express')
+
+
+let api = express()
+
+api.get('/api', (req, res) => res.send('aaa'))
+
+let server = api.listen(3000, () => console.log('api running on port 3000'))
+
 
 let mainWindow
 
@@ -14,7 +23,7 @@ function createWindow () {
   })
 
   mainWindow.loadFile('src/index.html')
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', () => {
     mainWindow = null
@@ -46,11 +55,10 @@ ipcMain.on('createdQuestion', async (e, question) => {
   mainWindow.webContents.send('createSuccess', 'Answer stored')
 })
 
-let newWindow
+let questionsWindow
 
-ipcMain.on('newWindow', async () => {
-  console.log('opening new window')
-  newWindow = new BrowserWindow({
+ipcMain.on('openQuestionsWindow', async () => {
+  questionsWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -60,9 +68,9 @@ ipcMain.on('newWindow', async () => {
     parent: mainWindow
   })
 
-  newWindow.loadFile('src/add/index.html')
-
-  newWindow.on('closed', () => {
-    newWindow = null
+  questionsWindow.loadFile('src/questions/index.html')
+  questionsWindow.webContents.openDevTools()
+  questionsWindow.on('closed', () => {
+    questionsWindow = null
   })
 })

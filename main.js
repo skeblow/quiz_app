@@ -3,12 +3,9 @@ const path = require('path')
 const express = require('express')
 
 
-let api = express()
-
-api.get('/api', (req, res) => res.send('aaa'))
-
-let server = api.listen(3000, () => console.log('api running on port 3000'))
-
+//let api = express()
+// api.get('/api', (req, res) => res.send('aaa'))
+// let server = api.listen(3000, () => console.log('api running on port 3000'))
 
 let mainWindow
 
@@ -73,4 +70,28 @@ ipcMain.on('openQuestionsWindow', async () => {
   questionsWindow.on('closed', () => {
     questionsWindow = null
   })
+})
+
+let questionWindow
+
+ipcMain.on('openQuestionWindow', async () => {
+  questionWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+    },
+    parent: questionsWindow
+  })
+
+  questionWindow.loadFile('src/question/index.html')
+  questionWindow.webContents.openDevTools()
+  questionWindow.on('closed', () => {
+    questionWindow = null
+  })
+})
+
+ipcMain.on('closeQuestionWindow', async () => {
+  questionWindow.close()
 })
